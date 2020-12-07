@@ -2,9 +2,8 @@ import numpy as np
 import time
 from sympy import *
 
-
-learningRate = 0.01
-iterations = 100
+learningRate = 0.001
+iterations = 1500
 N = 10
 x1 = np.linspace(2.6, 3.6, N) #largura da cremalheira
 x2 = np.linspace(0.7, 0.8, N) #módulo da engrenagem
@@ -14,13 +13,13 @@ x5 = np.linspace(7.8, 8.3, N) #comprimento do segundo veio entre rolamentos
 x6 = np.linspace(2.9, 3.9, N) #diâmetro do primeiro veio
 x7 = np.linspace(5, 5.5, N) #diâmetro do segundo veio
 
-x = np.array([[3.6],
-              [0.7],
-              [29],
-              [7.3],
-              [7.8],
-              [2.9],
-              [5]])
+x = np.array([[1],
+              [1],
+              [1],
+              [1],
+              [1],
+              [1],
+              [1]])
 
 
 restri = np.zeros(11)
@@ -60,7 +59,7 @@ def gradient(x):
     x6 = Symbol('x6')
     x7 = Symbol('x7')
     y = 0.7854 * x1 * x2 ** 2 * \
-        (3.3333 * x3 ** 2 + 14.9934 * x3 - 43.0934) \
+        (3.3333 * x3 ** 2 + 14.9334 * x3 - 43.0934) \
         - 1.508 * x1 * (x6 ** 2 + x7 ** 2) \
         + 0.7854 * (x4 * x6 ** 2 + x5 * x7 ** 2)
     dx1 = lambdify([x1, x2, x3, x4, x5, x6, x7], y.diff(x1), 'numpy')
@@ -70,10 +69,6 @@ def gradient(x):
     dx5 = lambdify([x1, x2, x3, x4, x5, x6, x7], y.diff(x5), 'numpy')
     dx6 = lambdify([x1, x2, x3, x4, x5, x6, x7], y.diff(x6), 'numpy')
     dx7 = lambdify([x1, x2, x3, x4, x5, x6, x7], y.diff(x7), 'numpy')
-
-
-
-
 
     grad = np.array([dx1(x[0],x[1],x[2],x[3],x[4],x[5],x[6]),
                      dx2(x[0],x[1],x[2],x[3],x[4],x[5],x[6]),
@@ -99,9 +94,11 @@ def gradient(x):
 def gradientDescent(x, iterations, learningRate):
     xn = np.zeros(len(x))
     dxn = np.zeros([len(x), 1])
-    gamma = np.ones([len(x), 1]) * 0.001
+    gamma = np.ones([len(x), 1]) * 0.0001
 
-    dx = gradient(x) + penal(x)
+    dx = gradient(x)*learningRate + np.squeeze(penal(x))
+    #print(np.sum(dx))
+
 
 
     for i in range(len(x)):
@@ -112,11 +109,11 @@ def gradientDescent(x, iterations, learningRate):
     for i in range(len(x)):
         gamma[i] = np.abs((xn[i] - x[i])*(dxn[i]-dx[i]))/np.linalg.norm((dxn-dx)**2)
 
-    return xn
+    return xn, dx
 
 def func(x):
     f = 0.7854 * x[0] * x[1] ** 2 * \
-        (3.3333 * x[2] ** 2 + 14.9934 * x[2] - 43.0934) \
+        (3.3333 * x[2] ** 2 + 14.9334 * x[2] - 43.0934) \
         - 1.508 * x[0] * (x[5] ** 2 + x[6] ** 2) \
         + 0.7854 * (x[3] * x[5] ** 2 + x[4] * x[6] ** 2)
     return f
@@ -168,20 +165,19 @@ def penal(x):
     h2 = ((397.5) / x[0] * x[2] * x[1] ** 2) - 1
     h3 = ((1.93 * x[3] ** 3) / x[1] * x[2] * x[5] ** 2) - 1
     h4 = ((1.93 * x[4] ** 3) / x[1] * x[5] * x[6] ** 4) - 1
-    h5 = (np.sqrt((745 * x[3] / x[1] * x[2]) ** 2 + 16.9 * 10 ** 6) / 110 * x[5] ** 3) - 1
-    h6 = np.sqrt(((745 * x[4]) / (x[1] * x[2])) ** 2 + 157.5 * 10 ** 6) / (85 * x[6] ** 3) - 1
+    h5 = (((745 * x[3] / x[1] * x[2]) ** 2 + 16.9 * 10 ** 6)**(1/2) / 110 * x[5] ** 3) - 1
+    h6 = (((745 * x[4]) / (x[1] * x[2])) ** 2 + 157.5 * 10 ** 6)**(1/2) / (85 * x[6] ** 3) - 1
     h7 = x[1] * x[2] / 40 - 1
     h8 = 5 * x[1] / x[0] - 1
     h9 = x[0] / (12 * x[1]) - 1
     h10 = (1.5 * x[5] + 1.9) / x[3] - 1
     h11 = (1.1 * x[6] + 1.9) / x[4] - 1
     h = np.array([h1, h2, h3, h4, h5, h6, h7, h8, h9, h10, h11])
-    for i in range(11):
-        if h[i] > 0:
-            penalty = grad
-        else:
-            penalty = 0
 
+    if max(h) > 0:
+         penalty = grad
+    else:
+         penalty = 0
     return penalty
 
 def interv(x, i):
@@ -200,14 +196,27 @@ def interv(x, i):
     m = switch.get(i)
     if x>m[1]:
          x = m[1]
+
     elif x<m[0]:
         x = m[0]
 
     return x
 
 #Driver
-for i in range(iterations):
-    x = gradientDescent(x,iterations, learningRate)
+x, dx = gradientDescent(x,iterations, learningRate)
+f = func(x)
+j = np.abs(dx)
+i= 0
+while int(max(j)) != 0:
+#for i in range(iterations):
+    x, dx = gradientDescent(x,iterations, learningRate)
     f = func(x)
+    j = np.abs(dx)
+    i = i+1
+    if i%50 == 0:
+        print(dx)
+    if i>10**5:
+        break
+
 print(x)
 print(f)
