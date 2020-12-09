@@ -2,6 +2,7 @@ from numpy import random
 import sympy
 from sympy import *
 import numpy as np
+import math
 def numberPick():
     switch = {
         0: [2.6, 3.6],
@@ -16,6 +17,14 @@ def numberPick():
     for i in range(7):
         m = switch.get(i)
         x[i] = x[i]*(m[1]-m[0]) + m[0]
+    x[0]= 3.499999
+    x[1]= 0.7
+    x[2]= 17
+    x[3]= 7.3
+    x[4]= 7.8
+    x[5]= 3.350215
+    x[6]= 5.286683
+    print(x)
     return x
 '''
 def function():
@@ -100,7 +109,7 @@ def differentiation(x):
     x5 = Symbol('x5')
     x6 = Symbol('x6')
     x7 = Symbol('x7')
-    func = f + g**2 + h**2
+    func = f + h + g
     dx1 = lambdify([x1, x2, x3, x4, x5, x6, x7], func.diff(x1), 'numpy')
     dx2 = lambdify([x1, x2, x3, x4, x5, x6, x7], func.diff(x2), 'numpy')
     dx3 = lambdify([x1, x2, x3, x4, x5, x6, x7], func.diff(x3), 'numpy')
@@ -120,22 +129,24 @@ def optimal(grad, x, gamma, maxIter, xn):
     j = 0
     delta = 0
     while j < maxIter:
-
+        print(func(x))
+        dx = 0
+        dxn = dx
+        xn = x
         dx = np.squeeze(grad(x))
-        delta = - 0.0001*dx + 0.9*delta
-        x = x + delta
-
+        delta = 0.0001*gamma*dx + 0.7*delta
+        x = x - delta
+        x[3] = math.ceil(x[3])
+        j = j+1
+        gamma = (x-xn)*(dx-dxn)/np.linalg.norm((dx-dxn)**2)
 
     return x
 def func(x):
-    y = 0.7854 * x[0] * x[1] ** 2 * \
-        (3.3333 * x[2] ** 2 + 14.9334 * x[2] - 43.0934) \
-        - 1.508 * x[0] * (x[5] ** 2 + x[6] ** 2) \
-        + 0.7854 * (x[3] * x[5] ** 2 + x[4] * x[6] ** 2)
+    y = 0.7854 * x[0] * (x[1] ** 2) * (3.3333 * (x[2] ** 2)+ 14.9334 * x[2] - 43.0934) - 1.508 * x[0] * ((x[5] ** 2) + (x[6] ** 2)) +7.4777*(x[5]**3 + x[6]**3)+ 0.7854 * (x[3] * (x[5] ** 2) + x[4] * (x[6] ** 2))
     return y
 
 x = np.squeeze(numberPick())
-iterations = 100
+iterations = 10000
 xn = np.squeeze(np.zeros([7, 1]))
 gamma = np.squeeze(np.ones([7,1]))*0.0001
 x = optimal(differentiation, x, gamma, iterations, xn)
