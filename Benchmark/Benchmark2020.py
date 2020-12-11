@@ -52,17 +52,17 @@ def AlgebricRestrictions():
     x6 = Symbol('x6')
     x7 = Symbol('x7')
 
-    g1 = (27 / (x1 * x3 * x2 ** 2)) - 1
-    g2 = (397.5 / (x1 * x3 ** 2 * x2 ** 2)) - 1
-    g3 = ((1.93 * x4 ** 3) / (x2 * x3 * x6 ** 4)) - 1
-    g4 = ((1.93 * x5 ** 3) / (x2 * x3 * x7 ** 4)) - 1
-    g5 = ((745 * x4 / (x2 * x3)) ** 2 + 16.9 * 10 ** 6) ** (1 / 2) / (110 * x6 ** 3) - 1
-    g6 = (((745 * x5) / (x2 * x3)) ** 2 + 157.5 * 10 ** 6) ** (1 / 2) / (85 * x7 ** 3) - 1
-    g7 = x2 * x3 / 40 - 1
-    g8 = 5 * x2 / x1 - 1
-    g9 = x1 / (12 * x2) - 1
-    g10 = (1.5 * x6 + 1.9) / x4 - 1
-    g11 = (1.1 * x7 + 1.9) / x5 - 1
+    g1 = ((27 / (x1 * x3 * x2 ** 2)) - 1)**2
+    g2 = ((397.5 / (x1 * x3 ** 2 * x2 ** 2)) - 1)**2
+    g3 = (((1.93 * x4 ** 3) / (x2 * x3 * x6 ** 4)) - 1)**2
+    g4 = (((1.93 * x5 ** 3) / (x2 * x3 * x7 ** 4)) - 1)**2
+    g5 = (((745 * x4 / (x2 * x3)) ** 2 + 16.9 * 10 ** 6) ** (1 / 2) / (110 * x6 ** 3) - 1)**2
+    g6 = ((((745 * x5) / (x2 * x3)) ** 2 + 157.5 * 10 ** 6) ** (1 / 2) / (85 * x7 ** 3) - 1)**2
+    g7 = (x2 * x3 / 40 - 1)**2
+    g8 = (5 * x2 / x1 - 1)**2
+    g9 = (x1 / (12 * x2) - 1)**2
+    g10 = ((1.5 * x6 + 1.9) / x4 - 1)**2
+    g11 = ((1.1 * x7 + 1.9) / x5 - 1)**2
     g = g1 + g2 + g3 + g4 + g5 + g5 + g6 + g7 + g8 + g9 + g10 + g11
     return g
 def Restrictions():
@@ -106,11 +106,13 @@ def differentiation(x):
     x7 = Symbol('x7')
     g1 = AlgebricRestrictions()
     lam_g = lambdify([x1, x2, x3, x4, x5, x6, x7], g1, "numpy")
-    restri = lam_g(x[0], x[1], x[2], x[3], x[4], x[5], x[6])
-    if restri < 0:
-        func = f + h
-    else:
-        func = f + h + g
+    restri = (lam_g(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))
+    #if restri < 0:
+     #   func = f + h
+
+    #else:
+    func = f + h + g
+        #print("restrições mal")
 
     dx1 = lambdify([x1, x2, x3, x4, x5, x6, x7], func.diff(x1), 'numpy')
     dx2 = lambdify([x1, x2, x3, x4, x5, x6, x7], func.diff(x2), 'numpy')
@@ -126,7 +128,7 @@ def differentiation(x):
                      dx5(x[0], x[1], x[2], x[3], x[4], x[5], x[6]),
                      dx6(x[0], x[1], x[2], x[3], x[4], x[5], x[6]),
                      dx7(x[0], x[1], x[2], x[3], x[4], x[5], x[6])])
-    #dxdx1
+
 
     return grad
 def differentiation2():
@@ -220,13 +222,13 @@ def symbolToNumeric(grad,x):
     doubleGrad = np.zeros([7,7])
     for i in range(7):
         for j in range(7):
-            print(grad[i])
+
             doubleGrad[i,j] = lambdify([x[0], x[1], x[2], x[3], x[4], x[5], x[6]], grad[i][j], 'numpy')
-            print(2)
+
 
 
     return doubleGrad
-def optimal(doubleGrad, grad, x, gamma, maxIter, xn):
+def optimal(grad, x, gamma, maxIter, xn):
     j = 0
     delta = 0
     xValue = np.zeros([7,1])
@@ -239,9 +241,9 @@ def optimal(doubleGrad, grad, x, gamma, maxIter, xn):
     dx = 0
     dt = 0
     alpha = 0.001
-    print(doubleGrad)
+    epsilon = 1e-6
     while j < maxIter:
-        symbolToNumeric(doubleGrad,x)
+        #symbolToNumeric(doubleGrad,x)
         t = t+dt
         dxn = dx
         xn = x
@@ -251,25 +253,31 @@ def optimal(doubleGrad, grad, x, gamma, maxIter, xn):
         pt = p/(1-m1**t)
         qt = q/(1-m2**t)
         alphat = alpha * (np.sqrt(abs(1 - m2 ** t)) / (1 - m1 ** t))
-        x = x-alphat*pt/np.sqrt(np.abs(qt))
-        dt = alphat*pt/np.sqrt(np.abs(qt))
+        x = x-alphat*pt/(np.sqrt(np.abs(qt))+epsilon)
+        dt = alphat*pt/(np.sqrt(np.abs(qt))+epsilon)
 
         #delta = 0.01*gamma*dx + 0.9*delta
         #x = x - delta
         #x[3] = math.ceil(x[3])
         j = j+1
         gamma = (x-xn)*(dx-dxn)/np.linalg.norm((dx-dxn)**2)
+        print(func(x))
+        #if (func(x)/func(xn)>0.9999) and j > 10:
+         #   print(func(x))
+          #  print(x)
+           # break
+
     return x
 def func(x):
     y = 0.7854 * x[0] * (x[1] ** 2) * (3.3333 * (x[2] ** 2)+ 14.9334 * x[2] - 43.0934) - 1.508 * x[0] * ((x[5] ** 2) + (x[6] ** 2)) +7.4777*(x[5]**3 + x[6]**3)+ 0.7854 * (x[3] * (x[5] ** 2) + x[4] * (x[6] ** 2))
     return y
 
 x = np.squeeze(numberPick())
-iterations = 5000
+iterations = 10e5
 xn = np.squeeze(np.zeros([7, 1]))
 gamma = np.squeeze(np.ones([7,1]))*0.0001
-doubleGrad = differentiation2()
-x = optimal(doubleGrad, differentiation, x, gamma, iterations, xn)
+#doubleGrad = differentiation2()
+x = optimal(differentiation, x, gamma, iterations, xn)
 y = func(x)
 print(x)
 print(y)
