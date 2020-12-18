@@ -9,7 +9,7 @@ essential use is to duplicate the measure of torque produced by an information p
 
 The weight of a speed reducer is to be minimised subjected to constraints on levels of bending stress of the gear teeth, surface stress, transverse deflections of the shafts and stresses in the shafts [2]. This design 2 A. Andrade-Campos, J. Dias-de-Oliveira problem involves seven design variables, as shown in Figure 2, which are the face width, x1, module of the teeth, x2, number of teeth on the pinion, x3, length of the first shaft between bearings, x4, length of the second shaft between bearings, x5, diameter of the first shaft, x6, and diameter of the second shaft, x7. The third variable, x3, is an integer, while the rest are continuous. With eleven constraints, this is a constrained optimisation problem.
 
-
+![reducer](https://github.com/alexdannyvaladares/ONLENG/blob/main/Benchmark/Reducer.JPG)
 
 ### **Optimization algorithm used & challenges**
 
