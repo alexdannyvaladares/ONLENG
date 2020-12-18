@@ -15,7 +15,9 @@ The weight of a speed reducer is to be minimised subjected to constraints on lev
 
 
 
-### **Optimization used & chalanges**
+
+
+### **Optimization algorithm used & chalanges**
 
 ### **Results**
 
