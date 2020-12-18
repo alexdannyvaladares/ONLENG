@@ -1,6 +1,6 @@
 # Weight minimisation of a speed reducer
 
-The problem was proposed within the scope of the Non-Linear Otimization curricular unit of the mechanical engineering master. For a detailed explanation of the code and results discussion, check the Benchmark2020.pdf.
+The problem was proposed within the scope of the Non-Linear Otimization curricular unit of the mechanical engineering master. For a detailed explanation of the formulation,code and results discussion, check the Benchmark2020.pdf.
 
 ### **Introduction of the Non-Linear Problem**
 
@@ -11,17 +11,16 @@ The weight of a speed reducer is to be minimised subjected to constraints on lev
 
 
 
-### **Formulation**
+### **Optimization algorithm used & challenges**
+
+**Adaptive moment estimation method:**
+This is a method that you can see as a combination between the stochastic gradient method and RMSProp. It uses the square of the gradients to update the “learning rate” at each iteration, at the same time that we update moments in order to converge more quickly.
+
+**Challenge :**
+The implementation of the algorithm, in python, was a complex task because with the gradient method, there is a need to make the function objective from a restricted function, to an unrestricted function. To this end, we apllied some measures such as:
 
 
+-Use of a barrier function, in restrictions
 
 
-
-### **Optimization algorithm used & chalanges**
-
-### **Results**
-
-
-
-
-
+-Use of a smoothed module function in domain constraints.
