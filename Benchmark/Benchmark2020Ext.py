@@ -18,8 +18,9 @@ def numberPick():
     for i in range(7):
         m = switch.get(i)
         x[i] = x[i]*(m[1]-m[0]) + m[0]
-
+    x[0] = 2
     print(x)
+
     return x
 '''
 def function():
@@ -43,7 +44,8 @@ def AlgebricFunction():
         + 0.7854 * (x4 * x6 ** 2 + x5 * x7 ** 2)
 
     return f
-def AlgebricRestrictions(i):
+def AlgebricRestrictions(i, x):
+    value = np.zeros([11,1])
     x1 = Symbol('x1')
     x2 = Symbol('x2')
     x3 = Symbol('x3')
@@ -77,6 +79,17 @@ def AlgebricRestrictions(i):
     value_g10 = lambdify([x1, x2, x3, x4, x5, x6, x7], g10, "numpy")
     value_g11 = lambdify([x1, x2, x3, x4, x5, x6, x7], g11, "numpy")
 
+    value[0] = (value_g1(x[0], x[1], x[2], x[3], x[4], x[5], x[6])) > 0
+    value[1] = (value_g2(x[0], x[1], x[2], x[3], x[4], x[5], x[6])) > 0
+    value[2] = (value_g3(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))> 0
+    value[3] = (value_g4(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))> 0
+    value[4] = (value_g5(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))> 0
+    value[5] = (value_g6(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))> 0
+    value[6] = (value_g7(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))> 0
+    value[7] = (value_g8(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))> 0
+    value[8] = (value_g9(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))> 0
+    value[9] = (value_g10(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))> 0
+    value[10] = (value_g11(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))> 0
 
 
     g = -log(-g1) - log(-g2) - log(-g3) - log(-g4) - log(-g5) - log(-g5) - log(-g6) - log(-g7) -log(-g8) - log(-g9) - log(-g10) - log(-g11)
@@ -84,18 +97,8 @@ def AlgebricRestrictions(i):
     if i == 1:
         return g
     else:
-        return [[g1],
-                [g2],
-                [g3],
-                [g4],
-                [g5],
-                [g6],
-                [g7],
-                [g8],
-                [g9],
-                [g10],
-                [g11]]
-def Restrictions(i):
+        return value
+def Restrictions(i, x):
     x1 = Symbol('x1')
     x2 = Symbol('x2')
     x3 = Symbol('x3')
@@ -104,31 +107,31 @@ def Restrictions(i):
     x6 = Symbol('x6')
     x7 = Symbol('x7')
 
-    inf1 = (x1 - 2.6)**2
-    inf2 = (x2 - 0.7)**2
-    inf3 = (x3 - 17)**2
-    inf4 = (x4 - 7.3)**2
-    inf5 = (x5 - 7.8)**2
-    inf6 = (x6 - 2.9)**2
-    inf7 = (x7 - 5)**2
+    inf1 = lambdify(x1, (x1 - 2.6), "numpy")
+    inf2 = lambdify(x2,(x2 - 0.7), "numpy")
+    inf3 = lambdify(x3,(x3 - 17), "numpy")
+    inf4 = lambdify(x4,(x4 - 7.3), "numpy")
+    inf5 = lambdify(x5,(x5 - 7.8), "numpy")
+    inf6 = lambdify(x6,(x6 - 2.9), "numpy")
+    inf7 = lambdify(x7,(x7 - 5), "numpy")
 
-    sup1 = (3.6 - x1)**2
-    sup2 = (0.8 - x2)**2
-    sup3 = (28 - x3)**2
-    sup4 = (8.3 - x4)**2
-    sup5 = (8.3 - x5)**2
-    sup6 = (3.9 - x6)**2
-    sup7 = (5.5 - x7)**2
-    h = (inf1 + sup1)**(1/2) + (inf2 + sup2)**(1/2) + (inf3 + sup3)**(1/2) + (inf4 + sup4)**(1/2) + (inf5 + sup5)**(1/2) + (inf6 + sup6)**(1/2) + (inf7 + sup7)**(1/2)
-    g = [[inf1], [inf2], [inf3], [inf4], [inf5], [inf6], [inf7], [sup1], [sup2], [sup3], [sup4], [sup5], [sup6], [sup7]]
-    if i == 1:
-        return h
-    else:
-        return g
+    sup1 = lambdify(x1, (3.6 - x1), "numpy")
+    sup2 = lambdify(x2, (0.8 - x2), "numpy")
+    sup3 = lambdify(x3, (28 - x3), "numpy")
+    sup4 = lambdify(x4, (8.3 - x4), "numpy")
+    sup5 = lambdify(x5, (8.3 - x5), "numpy")
+    sup6 = lambdify(x6, (3.9 - x6), "numpy")
+    sup7 = lambdify(x7, (5.5 - x7), "numpy")
+
+    g = (np.array([inf1(x[0]), inf2(x[1]), inf3(x[2]), inf4(x[3]), inf5(x[4]), inf6(x[5]), inf7(x[6])])<0)*1
+    h = (np.array([sup1(x[0]), sup2(x[1]), sup3(x[2]), sup4(x[3]), sup5(x[4]), sup6(x[5]), sup7(x[6])])<0)*1
+
+
+    return g, h
 def differentiation(x):
     f = AlgebricFunction()
-    h = AlgebricRestrictions(1)
-    g = Restrictions(1)
+    #h = AlgebricRestrictions(1,x)
+    [hinf, hsup] = Restrictions(1, x)
     x1 = Symbol('x1')
     x2 = Symbol('x2')
     x3 = Symbol('x3')
@@ -136,22 +139,12 @@ def differentiation(x):
     x5 = Symbol('x5')
     x6 = Symbol('x6')
     x7 = Symbol('x7')
-    g1 = AlgebricRestrictions(0)
-    lam_g = lambdify([x1, x2, x3, x4, x5, x6, x7], g1, "numpy")
-    restri_g = (lam_g(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))
-
-    lam_h = lambdify([x1, x2, x3, x4, x5, x6, x7], Restrictions(0), "numpy")
-    restri_h = (lam_h(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))
-
-    maxG = np.array((restri_g))
-    #print(maxG)
-    maxH = np.array(restri_h)
-    #print(maxH)
-    if max(maxG) < 0:
-       func = f + h
-       print("é menor")
-    else:
-        func = f + h + g
+    g = AlgebricRestrictions(0,x)
+    print(hinf)
+    g = g*10**22
+    hinf = hinf*(10**22)
+    hsup = -hsup*10**22
+    func = f
 
 
     dx1 = lambdify([x1, x2, x3, x4, x5, x6, x7], func.diff(x1), 'numpy')
@@ -168,7 +161,7 @@ def differentiation(x):
                      dx5(x[0], x[1], x[2], x[3], x[4], x[5], x[6]),
                      dx6(x[0], x[1], x[2], x[3], x[4], x[5], x[6]),
                      dx7(x[0], x[1], x[2], x[3], x[4], x[5], x[6])])
-
+    grad = grad + g + hinf + hsup
 
     return grad
 
@@ -206,10 +199,10 @@ def optimal(grad, x, gamma, maxIter, xn):
         q = m2*q+(1-m2)*dx**2
         pt = p/(1-m1**t)
         qt = q/(1-m2**t)
-        alphat = alpha * (np.sqrt(abs(1 - m2 ** t)) / (1 - m1 ** t))
-        x = x-alphat*pt/(np.sqrt(np.abs(qt))+epsilon)
-        dt = alphat*pt/(np.sqrt(np.abs(qt))+epsilon)
-
+        alphat = alpha * ((abs(1 - m2 ** t)) / (1 - m1 ** t))**(1/2)
+        x = x-alphat*pt/((np.abs(qt))+epsilon)**(1/2)
+        dt = alphat*pt/((np.abs(qt))+epsilon)**(1/2)
+        print(func(x))
         #delta = 0.01*gamma*dx + 0.9*delta
         #x = x - delta
         #x[3] = math.floor(x[3])
