@@ -21,14 +21,7 @@ def numberPick():
 
     print(x)
     return x
-'''
-def function():
-    f = 0.7854 * x[0] * x[1] ** 2 * \
-        (3.3333 * x[2] ** 2 + 14.9334 * x[2] - 43.0934) \
-        - 1.508 * x[0] * (x[5] ** 2 + x[6] ** 2) \
-        + 0.7854 * (x[3] * x[5] ** 2 + x[4] * x[6] ** 2)
 
-    return f'''
 def AlgebricFunction():
     x1 = Symbol('x1')
     x2 = Symbol('x2')
@@ -121,21 +114,8 @@ def differentiation(x):
     x6 = Symbol('x6')
     x7 = Symbol('x7')
     g1 = AlgebricRestrictions(0)
-    lam_g = lambdify([x1, x2, x3, x4, x5, x6, x7], g1, "numpy")
-    restri_g = (lam_g(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))
 
-    lam_h = lambdify([x1, x2, x3, x4, x5, x6, x7], Restrictions(0), "numpy")
-    restri_h = (lam_h(x[0], x[1], x[2], x[3], x[4], x[5], x[6]))
-
-    maxG = np.array((restri_g))
-    #print(maxG)
-    maxH = np.array(restri_h)
-    #print(maxH)
-    if max(maxG) < 0:
-       func = f + h
-       print("é menor")
-    else:
-        func = f + h + g
+    func = f + h + g
 
 
     dx1 = lambdify([x1, x2, x3, x4, x5, x6, x7], func.diff(x1), 'numpy')
@@ -163,14 +143,9 @@ def symbolToNumeric(grad,x):
 
             doubleGrad[i,j] = lambdify([x[0], x[1], x[2], x[3], x[4], x[5], x[6]], grad[i][j], 'numpy')
 
-
-
     return doubleGrad
 def optimal(grad, x, gamma, maxIter, xn):
     j = 0
-    delta = 0
-    xValue = np.zeros([7,1])
-    valueFunc = 1000
     p = 0
     q = 0
     m1 = 0.9
@@ -194,29 +169,26 @@ def optimal(grad, x, gamma, maxIter, xn):
         x = x-alphat*pt/(np.sqrt(np.abs(qt))+epsilon)
         dt = alphat*pt/(np.sqrt(np.abs(qt))+epsilon)
 
-        #delta = 0.01*gamma*dx + 0.9*delta
-        #x = x - delta
-        #x[3] = math.floor(x[3])
         j = j+1
-        #gamma = (x-xn)*(dx-dxn)/np.linalg.norm((dx-dxn)**2)
 
-
-        if ((func(x)/func(xn)>0.99999) and func(x)/func(xn)<1.00001) and j > 10:
-            #print(func(x))
-            #print(x)
+        if ((func(x)/func(xn)>0.9999999) and func(x)/func(xn)<1.0000001) and j > 10:
+            erro = func(x)/func(xn)
             break
 
-    return x
+    return x, j, erro
 def func(x):
     y = 0.7854 * x[0] * (x[1] ** 2) * (3.3333 * (x[2] ** 2)+ 14.9334 * x[2] - 43.0934) - 1.508 * x[0] * ((x[5] ** 2) + (x[6] ** 2)) +7.4777*(x[5]**3 + x[6]**3)+ 0.7854 * (x[3] * (x[5] ** 2) + x[4] * (x[6] ** 2))
     return y
 
+
+#Driver
 x = np.squeeze(numberPick())
 iterations = 10e5
 xn = np.squeeze(np.zeros([7, 1]))
 gamma = np.squeeze(np.ones([7,1]))*0.0001
-#doubleGrad = differentiation2()
-x = optimal(differentiation, x, gamma, iterations, xn)
+[x, iter, erro] = optimal(differentiation, x, gamma, iterations, xn)
 y = func(x)
 print(x)
 print(y)
+print(iter)
+print(erro)
