@@ -4,11 +4,7 @@ from sympy import *
 from sympy.utilities.lambdify import lambdify, implemented_function
 import numpy as np
 import math
-import xlwt
-from xlwt import Workbook
-
 def numberPick():
-
     switch = {
         0: [2.6, 3.6],
         1: [0.7, 0.8],
@@ -22,16 +18,7 @@ def numberPick():
     for i in range(7):
         m = switch.get(i)
         x[i] = x[i]*(m[1]-m[0]) + m[0]
-    '''
-    x = random.rand(7,1)
-    x[0] = 3.499999
-    x[1] = 0.7
-    x[2] = 17
-    x[3] = 7.3
-    x[4] = 7.8
-    x[5] = 3.350215
-    x[6] = 5.286683
-    '''
+
     print(x)
     return x
 
@@ -85,8 +72,7 @@ def AlgebricRestrictions(i):
                 [g9],
                 [g10],
                 [g11]]
-
-def Restrictions(i, x):
+def Restrictions(i):
     x1 = Symbol('x1')
     x2 = Symbol('x2')
     x3 = Symbol('x3')
@@ -94,38 +80,48 @@ def Restrictions(i, x):
     x5 = Symbol('x5')
     x6 = Symbol('x6')
     x7 = Symbol('x7')
-    restri = np.zeros([14,1])
-    inf1 = -log(x1 - 2.6)
-    inf2 = -log(x2 - 0.7)
-    inf3 = -log(x3 - 17)
-    inf4 = -log(x4 - 7.3)
-    inf5 = -log(x5 - 7.8)
-    inf6 = -log(x6 - 2.9)
-    inf7 = -log(x7 - 5)
 
-    sup1 = -log(3.6 - x1)
-    sup2 = -log(0.8 - x2)
-    sup3 = -log(28 - x3)
-    sup4 = -log(8.3 - x4)
-    sup5 = -log(8.3 - x5)
-    sup6 = -log(3.9 - x6)
-    sup7 = -log(5.5 - x7)
+    inf1 = -log((x1 - 2.6)*10**6)
+    inf2 = -log((x2 - 0.7)*10**6)
+    inf3 = -log((x3 - 17)*10**6)
+    inf4 = -log((x4 - 7.3)*10**6)
+    inf5 = -log((x5 - 7.8)*10**6)
+    inf6 = -log((x6 - 2.9)*10**6)
+    inf7 = -log((x7 - 5)*10**6)
 
+    sup1 = -log((3.6 - x1)*10**6)
+    sup2 = -log((0.8 - x2)*10**6)
+    sup3 = -log((28 - x3)*10**6)
+    sup4 = -log((8.3 - x4)*10**6)
+    sup5 = -log((8.3 - x5)*10**6)
+    sup6 = -log((3.9 - x6)*10**6)
+    sup7 = -log((5.5 - x7)*10**6)
 
-
-
-    h = inf1 + inf2 + inf3 + inf4 + inf5 + inf6 + inf7 + sup1 + sup2 + sup3 + sup4 + sup5 + sup6 + sup7
-    #h = log(inf1)+log(inf2)**4+log(inf3)**4-log(inf4)-log(inf5)-log(inf6)-log(inf7)-log(sup1)-log(sup2)-log(sup3)-log(sup4)-log(sup5)-log(sup6)-log(sup7)
+    h = inf1 + inf2**2 + inf3 + inf4 + inf5 + inf6 + inf7 + sup1 + sup2 + sup3 + sup4 + sup5 + sup6 + sup7
     #h = (inf1 + sup1)**(1/2) + (inf2 + sup2)**(1/2) + (inf3 + sup3)**(1/2) + (inf4 + sup4)**(1/2) + (inf5 + sup5)**(1/2) + (inf6 + sup6)**(1/2) + (inf7 + sup7)**(1/2)
     g = [[inf1], [inf2], [inf3], [inf4], [inf5], [inf6], [inf7], [sup1], [sup2], [sup3], [sup4], [sup5], [sup6], [sup7]]
     if i == 1:
         return h
     else:
+        g = np.array([lambdify([x1, x2, x3, x4, x5, x6, x7], g(x1), 'numpy')],
+                     [lambdify([x1, x2, x3, x4, x5, x6, x7], g(x2), 'numpy')],
+                     [lambdify([x1, x2, x3, x4, x5, x6, x7], g(x3), 'numpy')],
+                     [lambdify([x1, x2, x3, x4, x5, x6, x7], g(x4), 'numpy')],
+                     [lambdify([x1, x2, x3, x4, x5, x6, x7], g(x5), 'numpy')],
+                     [lambdify([x1, x2, x3, x4, x5, x6, x7], g(x6), 'numpy')],
+                     [lambdify([x1, x2, x3, x4, x5, x6, x7], g(x7), 'numpy')],
+                     [lambdify([x1, x2, x3, x4, x5, x6, x7], g(x1), 'numpy')],
+                     [lambdify([x1, x2, x3, x4, x5, x6, x7], g(x2), 'numpy')],
+                     [lambdify([x1, x2, x3, x4, x5, x6, x7], g(x3), 'numpy')],
+                     [lambdify([x1, x2, x3, x4, x5, x6, x7], g(x4), 'numpy')],
+                     [lambdify([x1, x2, x3, x4, x5, x6, x7], g(x5), 'numpy')],
+                     [lambdify([x1, x2, x3, x4, x5, x6, x7], g(x6), 'numpy')],
+                     [lambdify([x1, x2, x3, x4, x5, x6, x7], g(x7), 'numpy')])
         return g
 def differentiation(x):
     f = AlgebricFunction()
     h = AlgebricRestrictions(1)
-    g = Restrictions(1,x)
+    g = Restrictions(1)
     x1 = Symbol('x1')
     x2 = Symbol('x2')
     x3 = Symbol('x3')
@@ -134,6 +130,8 @@ def differentiation(x):
     x6 = Symbol('x6')
     x7 = Symbol('x7')
     g1 = AlgebricRestrictions(0)
+    for i in range(14):
+        if g1[i] < 0:
 
     func = f + h + g
 
@@ -155,6 +153,7 @@ def differentiation(x):
 
 
     return grad
+
 def symbolToNumeric(grad,x):
     doubleGrad = np.zeros([7,7])
     for i in range(7):
@@ -167,19 +166,16 @@ def optimal(grad, x, gamma, maxIter, xn):
     j = 0
     p = 0
     q = 0
-    m1 = 0.99
-    m2 = 0.9999
+    m1 = 0.9
+    m2 = 0.999
     t=1
     dx = 0
     dt = 0
     alpha = 0.001
     epsilon = 1e-6
-    f = np.zeros([10000,10000])
-    wb = Workbook()
-    sheet1 = wb.add_sheet('Sheet 1')
     while j < maxIter:
         #symbolToNumeric(doubleGrad,x)
-        t = t+dt
+        t = t+1
         dxn = dx
         xn = x
         dx = np.squeeze(grad(x))
@@ -192,15 +188,13 @@ def optimal(grad, x, gamma, maxIter, xn):
         dt = alphat*pt/(np.sqrt(np.abs(qt))+epsilon)
         x[2] = np.round(x[2],0)
         j = j+1
-        sheet1.write(j,3, func(x))
-        sheet1.write(j,2, j)
         print(func(x))
-        if ((func(x)/func(xn)>0.999) and func(x)/func(xn)<1.0001) and j > 10:
+
+        if ((func(x)/func(xn)>0.9999) and func(x)/func(xn)<1.0001) and j > 10:
             erro = func(x)/func(xn)
-            wb.save('xlwt dadosteste2.xls')
             break
 
-    return x, j, erro, f
+    return x, j, erro
 def func(x):
     y = 0.7854 * x[0] * (x[1] ** 2) * (3.3333 * (x[2] ** 2)+ 14.9334 * x[2] - 43.0934) - 1.508 * x[0] * ((x[5] ** 2) + (x[6] ** 2)) +7.4777*(x[5]**3 + x[6]**3)+ 0.7854 * (x[3] * (x[5] ** 2) + x[4] * (x[6] ** 2))
     return y
@@ -211,9 +205,8 @@ x = np.squeeze(numberPick())
 iterations = 10e5
 xn = np.squeeze(np.zeros([7, 1]))
 gamma = np.squeeze(np.ones([7,1]))*0.0001
-[x, iter, erro, f] = optimal(differentiation, x, gamma, iterations, xn)
+[x, iter, erro] = optimal(differentiation, x, gamma, iterations, xn)
 y = func(x)
-wb = Workbook()
 print(x)
 print(y)
 print(iter)
